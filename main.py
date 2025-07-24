@@ -4,4 +4,4 @@ app = FastAPI()
 
 app.get("/health")
 def health():
-    return {"status": "awaiting projects..."}
+    return {"status": "awaiting projects.."}
