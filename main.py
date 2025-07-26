@@ -27,6 +27,7 @@ PROJECTS = {
         [
             Command(["npm", "install"], PROJECT_PATHS["novelty_checker_frontend"]),
             Command(["npm", "run", "build"], PROJECT_PATHS["novelty_checker_frontend"]),
+            Command(["PORT=3000","npm", "run", "start"], PROJECT_PATHS["novelty_checker_frontend"]),
         ],
     )
 }
