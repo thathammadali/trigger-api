@@ -17,7 +17,7 @@ class Project:
 
 # === Project Configuration ===
 PROJECT_PATHS = {
-    "novelty_checker_frontend": "/root/novelty-checker"
+    "novelty_checker_frontend": "/root/novelty_checker_frontend",
 }
 
 PROJECTS = {
