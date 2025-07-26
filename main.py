@@ -30,15 +30,15 @@ class Project:
         self.commands = commands
 
 PROJECT_PATHS = {
-    "novelty-checker_frontend": "/root/novelty-checker"
+    "novelty_checker_frontend": "/root/novelty-checker"
 }
 
 PROJECTS = {
-    "novelty-checker_frontend": Project(PROJECT_PATHS['novelty-checker_frontend'],
+    "novelty_checker_frontend": Project(PROJECT_PATHS['novelty_checker_frontend'],
             "https://thathammadali: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@github.com/MuhammadAnas1657/novelty_checker_frontend",
             [
-                Command(["npm","install"], PROJECT_PATHS['novelty-checker_frontend']),
-                Command(["npm","run","build"], PROJECT_PATHS['novelty-checker_frontend'])
+                Command(["npm","install"], PROJECT_PATHS['novelty_checker_frontend']),
+                Command(["npm","run","build"], PROJECT_PATHS['novelty_checker_frontend'])
             ])
 }
 
