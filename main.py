@@ -27,7 +27,7 @@ PROJECTS = {
         [
             Command(["npm", "install"], PROJECT_PATHS["novelty_checker_frontend"]),
             Command(["npm", "run", "build"], PROJECT_PATHS["novelty_checker_frontend"]),
-            Command(["pm2", "delete", "novelty-checker"], PROJECT_PATHS["novelty_checker_frontend"]),
+            Command(["bash", "-c", "pm2 delete novelty-checker || true"], PROJECT_PATHS["novelty_checker_frontend"]),
             Command(["pm2", "start", "npm", "--name", "novelty-checker", "--", "run", "start"], PROJECT_PATHS["novelty_checker_frontend"]),
         ],
     )
