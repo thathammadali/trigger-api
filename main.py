@@ -60,7 +60,7 @@ async def update(request: Request):
     project = PROJECTS[repo_name]
 
     if not os.path.exists(project.directory):
-        run_and_log(["git", "clone", project.repository], Path(project.directory).parent)
+        run_and_log(["git", "clone", project.repository, project.directory], Path(project.directory).parent)
     else:
         run_and_log(["git", "pull"], project.directory)
 
