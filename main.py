@@ -54,6 +54,9 @@ async def update(request: Request):
     repo_full_name = payload["repository"]["full_name"]
     repo_name = repo_full_name.split("/")[-1]
 
+    with open("/root/test.log") as test:
+        test.write(f"{payload}\n{repo_full_name}")
+
     if repo_name not in PROJECTS:
         return {"error": f"Unknown repo: {repo_name}"}
 
