@@ -27,7 +27,8 @@ PROJECTS = {
         [
             Command(["npm", "install"], PROJECT_PATHS["novelty_checker_frontend"]),
             Command(["npm", "run", "build"], PROJECT_PATHS["novelty_checker_frontend"]),
-            Command(["npm", "run", "start"], PROJECT_PATHS["novelty_checker_frontend"]),
+            Command(["pm2", "delete", "novelty-checker"], PROJECT_PATHS["novelty_checker_frontend"]),
+            Command(["pm2", "start", "npm", "--name", "novelty-checker", "--", "run", "start"], PROJECT_PATHS["novelty_checker_frontend"]),
         ],
     )
 }
@@ -45,10 +46,6 @@ async def update(request: Request):
         payload = await request.json()
         repo_full_name = payload["repository"]["full_name"]
         repo_name = repo_full_name.split("/")[-1]
-
-        # Log request for debug
-        with open("/root/test.log", "a") as test:
-            test.write(f"\nPayload: {payload}\nRepo Name: {repo_name}\n")
 
         if repo_name not in PROJECTS:
             return {"error": f"Unknown repo: {repo_name}"}
@@ -72,7 +69,7 @@ async def update(request: Request):
         return {"status": f"{repo_name} updated successfully"}
 
     except Exception as e:
-        # Log any exception
         with open("/root/test.log", "a") as test:
             test.write(f"\n[ERROR] {str(e)}\n")
         return {"error": str(e)}
+
