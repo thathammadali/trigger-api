@@ -122,6 +122,9 @@ def deploy_project(repo_name):
 
     return {"status": f"{repo_name} updated successfully"}
 
+LOG_DIR = Path(__file__).parent / "logs"
+LOG_DIR.mkdir(exist_ok=True)
+
 # === App Init ===
 app = FastAPI()
 
@@ -138,8 +141,6 @@ async def update(request: Request):
 
         return deploy_project(repo_name)
     except Exception as e:
-        with open("/root/test.log", "a") as test:
-            test.write(f"\n[ERROR] {str(e)}\n")
         return {"error": str(e)}
 
 @app.get("/redeploy/{repo_name}")
@@ -147,6 +148,4 @@ async def redeploy(repo_name):
     try:
         return deploy_project(repo_name)
     except Exception as e:
-        with open("/root/test.log", "a") as test:
-            test.write(f"\n[ERROR] {str(e)}\n")
         return {"error": str(e)}
