@@ -69,14 +69,14 @@ def deploy_fastapi_project(project_name, port, description=None):
 
     if not service_path.exists():
         commands.extend([
-            Command(["sudo", "cp", f"services/{str(service_file)}", str(service_path)], str(project_path)),
-            Command(["sudo", "systemctl", "daemon-reload"]),
-            Command(["sudo", "systemctl", "enable", project_name]),
-            Command(["sudo", "systemctl", "start", project_name]),
+            Command(["cp", f"services/{str(service_file)}", str(service_path)], str(project_path)),
+            Command(["systemctl", "daemon-reload"]),
+            Command(["systemctl", "enable", project_name]),
+            Command(["systemctl", "start", project_name]),
         ])
     else:
         commands.append(
-            Command(["sudo", "systemctl", "restart", project_name])
+            Command(["systemctl", "restart", project_name])
         )
 
     return commands
