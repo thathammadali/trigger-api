@@ -25,51 +25,74 @@ def deploy_node_project(project_name):
         Command(["pm2", "start", "npm", "--name", project_name, "--", "run", "start"], project_path),
     ]
 
-def generate_fastapi_service(project_name, service_file, description, port):
+def generate_fastapi_service(project_name, service_file, description, port, type = "pip"):
     description = description or f"{project_name} FastAPI Service"
     Path("services").mkdir(exist_ok=True)
 
-    service_content = f'''                           
-[Unit]
-Description={description}
-After=network.target
+    service_content = f'''
+    [Unit]
+    Description={description}
+    After=network.target
 
-[Service]
-User=root
-WorkingDirectory=/root/{project_name}
-ExecStart=/root/{project_name}/venv/bin/uvicorn main:app --host 0.0.0.0 --port {port}
-Restart=always
-Environment=PYTHONUNBUFFERED=1
+    [Service]
+    User=root
+    WorkingDirectory=/root/{project_name}
+    ExecStart={f"/root/{project_name}/venv/bin/uvicorn main:app --host 0.0.0.0 --port {port}" if type == "pip" else f"/bin/bash -c 'source /root/anaconda3/etc/profile.d/conda.sh && conda activate {project_name}_env && uvicorn main:app --host 0.0.0.0 --port {port}'"}
+    Restart=always
+    Environment=PYTHONUNBUFFERED=1
 
-[Install]
-WantedBy=multi-user.target'''
+    [Install]
+    WantedBy=multi-user.target
+    '''
 
     with open(f"services/{str(service_file)}", "w") as f:
         f.write(service_content)
 
 def deploy_fastapi_project(project_name, port, description=None):
+    # Project Path
+    project_path = Path(PROJECT_PATHS[project_name])
+
+    # Service Files Setup
     service_file = f"{project_name}.service"
     service_path = Path(f"/etc/systemd/system/{service_file}")
-    project_path = Path(PROJECT_PATHS[project_name])
-    venv_path = project_path / "venv"
+
+    # Commands List
     commands = []
 
-    if (project_path / "environment.yml").exists():
+    # Environment file paths
+    conda_env_file = project_path / "environment.yml"
+    pip_env_file = project_path / "requirements.txt"
+
+    if conda_env_file.exists() and pip_env_file.exists():
+        log("Multiple requirement files found!")
+        return []
+    if conda_env_file.exists():
         log("Conda requirement file found!")
-        conda_path = "/root/anaconda3/condabin/conda"
-        commands.append(
-            Command([conda_path, "env", "create", "-f", "environment.yml"], str(project_path))
+        conda_path = "/root/anaconda3/etc/profile.d/conda.sh"
+
+        full_cmd = (
+            f"source {conda_path} && "
+            f"(conda env list | grep {project_name}_env && "
+            f"conda env update --name {project_name}_env --file environment.yml --prune || "
+            f"conda env create -f environment.yml) && "
+            f"conda activate {project_name}_env"
         )
-    elif (project_path / "requirements.txt").exists():
+
+        commands.append(
+            Command(["bash", "-c", full_cmd],
+                    str(project_path))
+        )
+    elif pip_env_file.exists():
         log("Pip requirement file found!")
+        venv_path = project_path / "venv"
         if not venv_path.exists():
             commands.append(
                 Command([sys.executable, "-m", "venv", "venv"], str(project_path))
             )
 
-        pip_exe = venv_path / "bin/pip"
+        pip_path = venv_path / "bin/pip"
         commands.append(
-            Command([str(pip_exe), "install", "-r", "requirements.txt"], str(project_path))
+            Command([str(pip_path), "install", "-r", "requirements.txt"], str(project_path))
         )
     else:
         log("No requirements file found!")
