@@ -21,3 +21,8 @@ def run_and_log(cmd, cwd=None):
         raise subprocess.CalledProcessError(result.returncode, cmd, result.stdout, result.stderr)
 
     return result
+
+def log(description):
+    timestamp = datetime.now().strftime("[%d-%m-%Y %H:%M:%S]")
+    with open("custom.log", "a") as log:
+        log.write(f"{timestamp} {description}\n")
