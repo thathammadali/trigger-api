@@ -58,7 +58,7 @@ def deploy_fastapi_project(project_name, port, description=None):
         log("Conda requirement file found!")
         conda_path = "/root/anaconda3/condabin/conda"
         commands.append(
-            Command([conda_path, "env", "create", "-f", "environment.yml"])
+            Command([conda_path, "env", "create", "-f", "environment.yml"], str(project_path))
         )
     elif (project_path / "requirements.txt").exists():
         log("Pip requirement file found!")
