@@ -24,5 +24,6 @@ def run_and_log(cmd, cwd=None):
 
 def log(description):
     timestamp = datetime.now().strftime("[%d-%m-%Y %H:%M:%S]")
-    with open("custom.log", "a") as log:
+
+    with open(LOG_DIR / "custom.log", "a") as log:
         log.write(f"{timestamp} {description}\n")
