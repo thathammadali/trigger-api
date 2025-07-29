@@ -1,6 +1,6 @@
 import sys
 from fastapi import FastAPI, Request
-from runner import run_and_log
+from runner import run_and_log, log
 from pathlib import Path
 
 # === Project Definition Classes ===
@@ -55,10 +55,12 @@ def deploy_fastapi_project(project_name, port, description=None):
     commands = []
 
     if (project_path / "environment.yml").exists():
+        log("Conda requirement file found!")
         commands.append(
             Command(["conda", "env", "create", "-f", "environment.yml"])
         )
     elif (project_path / "requirements.txt").exists():
+        log("Pip requirement file found!")
         if not venv_path.exists():
             commands.append(
                 Command([sys.executable, "-m", "venv", "venv"], str(project_path))
@@ -69,6 +71,7 @@ def deploy_fastapi_project(project_name, port, description=None):
             Command([str(pip_exe), "install", "-r", "requirements.txt"], str(project_path))
         )
     else:
+        log("No requirements file found!")
         return []
 
     if not Path(f"services/{str(service_file)}").exists():
