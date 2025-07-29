@@ -54,15 +54,22 @@ def deploy_fastapi_project(project_name, port, description=None):
     venv_path = project_path / "venv"
     commands = []
 
-    if not venv_path.exists():
+    if (project_path / "environment.yml").exists():
         commands.append(
-            Command([sys.executable, "-m", "venv", "venv"], str(project_path))
+            Command(["conda", "env", "create", "-f", "environment.yml"])
         )
+    elif (project_path / "requirements.txt").exists():
+        if not venv_path.exists():
+            commands.append(
+                Command([sys.executable, "-m", "venv", "venv"], str(project_path))
+            )
 
-    pip_exe = venv_path / "bin/pip"
-    commands.append(
-        Command([str(pip_exe), "install", "-r", "requirements.txt"], str(project_path))
-    )
+        pip_exe = venv_path / "bin/pip"
+        commands.append(
+            Command([str(pip_exe), "install", "-r", "requirements.txt"], str(project_path))
+        )
+    else:
+        return []
 
     if not Path(f"services/{str(service_file)}").exists():
         generate_fastapi_service(project_name, service_file, description, port)
@@ -117,6 +124,9 @@ def deploy_project(repo_name):
         run_and_log(["git", "pull"], str(project_dir))
 
     # Run associated commands
+    if project.commands == []:
+        return {"status": "No requirements file found"}
+
     for cmd in project.commands:
         run_and_log(cmd.cmd, cmd.cwd)
 
